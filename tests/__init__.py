@@ -1,0 +1,1 @@
+"""ScopeMate test package""" 
