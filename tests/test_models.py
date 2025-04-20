@@ -1,4 +1,4 @@
-"""Tests for ScopeMate models module"""
+"""Tests for scopemate models module"""
 import pytest
 from datetime import datetime
 from pydantic import ValidationError

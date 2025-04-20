@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-ScopeMate LLM - Handles interactions with Large Language Models
+scopemate LLM - Handles interactions with Large Language Models
 
-This module manages all interactions with LLMs, including prompt generation
-and response processing.
+This module provides functions for interacting with LLMs for task estimation,
+breakdown, and optimization.
 """
 import json
 from typing import Dict, Any, List, Optional

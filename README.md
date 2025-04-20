@@ -1,4 +1,4 @@
-# 🪜 ScopeMate
+# 🪜 scopemate
 
 A CLI tool for breaking down complex tasks into smaller subtasks with LLM-powered scope estimation and planning.
 
@@ -24,7 +24,7 @@ A CLI tool for breaking down complex tasks into smaller subtasks with LLM-powere
 
 ### From PyPI (Recommended)
 
-The easiest way to install ScopeMate is from PyPI:
+The easiest way to install scopemate is from PyPI:
 
 ```bash
 # Install using pip (any platform)
@@ -71,7 +71,7 @@ pip install -e .
 
 ### Setting up the OpenAI API Key
 
-ScopeMate requires an OpenAI API key to function. Set it as an environment variable:
+scopemate requires an OpenAI API key to function. Set it as an environment variable:
 
 #### macOS/Linux
 ```bash
@@ -141,7 +141,7 @@ The interactive mode (`scopemate --interactive`) will guide you through:
 
 ### Output Format
 
-ScopeMate generates a structured JSON output with the following format:
+scopemate generates a structured JSON output with the following format:
 
 ```json
 {
@@ -183,7 +183,7 @@ ScopeMate generates a structured JSON output with the following format:
 
 ### Integrating with Other Tools
 
-You can use ScopeMate's JSON output with other project management tools:
+You can use scopemate's JSON output with other project management tools:
 
 - Import tasks into JIRA using their API
 - Convert to CSV for import into spreadsheets

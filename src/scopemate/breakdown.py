@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-ScopeMate Breakdown - Functions for breaking down tasks into subtasks
+scopemate Breakdown - Functions for breaking down tasks into subtasks
 
-This module handles the process of breaking down tasks into smaller subtasks.
+This module provides task breakdown functionality, including subtask generation,
+alternative approach suggestion, and interactive refinement.
 """
 import uuid
 from typing import List, Dict, Any, Optional

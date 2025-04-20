@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-ScopeMate Task Analysis - Functions for analyzing and validating tasks
+scopemate Task Analysis - Functions for analyzing and validating tasks
 
-This module handles task analysis, including complexity checking, hierarchy
-validation, and estimation consistency.
+This module provides functions for analyzing task structures, validating
+task relationships, and ensuring estimate consistency.
 """
 from typing import List, Dict, Tuple, Optional, Set
 

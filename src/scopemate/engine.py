@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-ScopeMate Engine - Main application logic for ScopeMate
+scopemate Engine - Main application logic for scopemate
 
 This module contains the TaskEngine class which coordinates all the functionality
-of ScopeMate, handling the workflow for creating, breaking down, and saving tasks.
+of scopemate, handling the workflow for creating, breaking down, and saving tasks.
 """
 import os
 from typing import List, Optional, Dict, Any
@@ -24,7 +24,7 @@ from .interaction import prompt_user, build_root_task, print_summary
 
 class TaskEngine:
     """
-    Main engine for ScopeMate that coordinates task creation, breakdown, and management.
+    Main engine for scopemate that coordinates task creation, breakdown, and management.
     """
     
     def __init__(self):
@@ -189,7 +189,7 @@ class TaskEngine:
     def run(self) -> None:
         """Run the full interactive workflow."""
         # Display introduction
-        print("=== ScopeMate Action Plan Builder ===")
+        print("=== scopemate Action Plan Builder ===")
         print("This tool helps break down complex tasks and maintain consistent time estimates.")
         print("Now with interactive task breakdown - choose from alternative approaches and customize subtasks!")
         print("Note: Parent tasks will be automatically adjusted if child tasks take longer.\n")
@@ -208,6 +208,10 @@ class TaskEngine:
         
         # Finalize the plan
         self.finalize_plan()
+
+    def run_interactive(self) -> None:
+        """Run the interactive mode of the application."""
+        print("=== scopemate Action Plan Builder ===")
 
 
 def interactive_builder():

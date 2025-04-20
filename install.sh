@@ -1,22 +1,21 @@
 #!/bin/bash
-# Shell script to install ScopeMate on Linux/macOS systems
+# Shell script to install scopemate on Linux/macOS systems
 
 # Check for Python 3.10+
 python_version=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
-required_version="3.10"
-
-if [ "$(printf '%s\n' "$required_version" "$python_version" | sort -V | head -n1)" != "$required_version" ]; then
-    echo "Error: Python $required_version or higher is required. You have Python $python_version."
+if (( $(echo "$python_version < 3.10" | bc -l) )); then
+    echo "Error: Python 3.10 or higher is required."
+    echo "Your version: $python_version"
     exit 1
 fi
 
 # Install package
-echo "Installing ScopeMate..."
-pip3 install -e .
+echo "Installing scopemate..."
+python3 -m pip install -e .
 
-# Check if installation was successful
+# Check installation status
 if [ $? -eq 0 ]; then
-    echo "ScopeMate installed successfully!"
+    echo "scopemate installed successfully!"
     echo "You can now run 'scopemate --interactive' to start using it."
 else
     echo "Installation failed. Please check the error messages above."

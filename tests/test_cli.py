@@ -1,4 +1,4 @@
-"""Tests for ScopeMate CLI module"""
+"""Tests for scopemate CLI module"""
 import sys
 import tempfile
 import os

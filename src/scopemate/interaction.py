@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-ScopeMate Interaction - Functions for user interaction
+scopemate Interaction - Functions for user interaction
 
-This module handles all interactive aspects of ScopeMate, including
+This module handles all interactive aspects of scopemate, including
 collecting user input and displaying information.
 """
 from typing import List, Optional, Dict, Any
@@ -164,7 +164,7 @@ def build_root_task() -> ScopeMateTask:
     import uuid
     from .llm import estimate_scope
     
-    print("=== ScopeMate Action Plan Builder ===")
+    print("=== scopemate Action Plan Builder ===")
     
     title = prompt_user("Give a short TITLE for this task")
     summary = prompt_user("What is the primary PURPOSE of this task?")

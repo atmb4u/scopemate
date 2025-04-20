@@ -1,4 +1,4 @@
-"""Tests for ScopeMate storage module"""
+"""Tests for scopemate storage module"""
 import os
 import tempfile
 import json

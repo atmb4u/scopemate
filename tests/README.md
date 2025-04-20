@@ -1,6 +1,6 @@
-# ScopeMate Tests
+# scopemate Tests
 
-This directory contains tests for the ScopeMate package. The tests are organized by module and functionality.
+This directory contains tests for the scopemate package. The tests are organized by module and functionality.
 
 ## Test Structure
 

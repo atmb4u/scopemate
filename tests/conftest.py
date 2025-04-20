@@ -1,4 +1,4 @@
-"""Test configuration for ScopeMate tests"""
+"""Test configuration for scopemate tests"""
 import os
 import tempfile
 import pytest

@@ -1,11 +1,10 @@
-"""
-🪜 ScopeMate - A CLI tool for Purpose/Scope/Outcome planning
+"""🪜 scopemate - A CLI tool for Purpose/Scope/Outcome planning
 
-A tool to break down complex tasks into smaller subtasks, with LLM-driven scope
-estimation and breakdown.
+This package provides tools for breaking down complex tasks using
+the Purpose/Scope/Outcome planning approach.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 # Public API
 from .models import (

@@ -1,1 +1,1 @@
-"""ScopeMate test package""" 
+"""scopemate test package""" 

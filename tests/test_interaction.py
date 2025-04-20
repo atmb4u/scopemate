@@ -1,4 +1,4 @@
-"""Tests for ScopeMate interaction module"""
+"""Tests for scopemate interaction module"""
 import pytest
 from unittest.mock import patch, MagicMock
 

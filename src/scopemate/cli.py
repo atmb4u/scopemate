@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-🪜 ScopeMate CLI - Command-line interface for ScopeMate
+🪜 scopemate CLI - Command-line interface for scopemate
 
-Provides command-line interface for ScopeMate with options for setting purpose,
+Provides command-line interface for scopemate with options for setting purpose,
 outcome, and output file.
 """
 
@@ -103,7 +103,7 @@ def process_task_with_breakdown(task: ScopeMateTask) -> List[ScopeMateTask]:
 def command_line() -> None:
     """Process command line arguments and execute appropriate actions."""
     parser = argparse.ArgumentParser(
-        description="🪜 ScopeMate - CLI Tool for Purpose/Scope/Outcome planning"
+        description="🪜 scopemate - CLI Tool for Purpose/Scope/Outcome planning"
     )
     
     parser.add_argument(

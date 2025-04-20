@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""
-ScopeMate - CLI Tool for Purpose/Scope/Outcome planning (Legacy module)
+"""scopemate - CLI Tool for Purpose/Scope/Outcome planning (Legacy module)
 
-This module is kept for backward compatibility. New code should use the modular 
-architecture provided in the other modules.
+This is a legacy module maintained for backward compatibility.
+All functionality has been moved to more specialized modules.
 """
 import sys
 

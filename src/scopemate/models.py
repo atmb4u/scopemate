@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-ScopeMate Models - Pydantic models for task representation
+scopemate Models - Pydantic models for task representation
 
-This module contains the data models used throughout ScopeMate for representing
+This module contains the data models used throughout scopemate for representing
 tasks, their purpose, scope, outcome, and metadata.
 """
 import datetime as dt

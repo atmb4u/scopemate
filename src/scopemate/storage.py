@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """
-ScopeMate Storage - Functions for saving and loading task data
+scopemate Storage - Functions for saving and loading task data
 
-This module handles persistence of task data to/from files, including
-checkpointing and loading plans.
+This module manages persistence of task data to disk and loading from files.
 """
 import os
 import json

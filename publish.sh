@@ -2,10 +2,15 @@
 # Script to build and publish scopemate package to PyPI
 
 # Clean up previous builds
-rm -rf build/ dist/ src/*.egg-info/
+echo "Cleaning up previous builds..."
+rm -rf dist build *.egg-info
 
 # Build the package
-python3 -m build
+echo "Building package..."
+python -m build
+
+echo "Package built. To publish:"
+echo "twine upload dist/*"
 
 # Check the package
 twine check dist/*

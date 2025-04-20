@@ -1,4 +1,4 @@
-"""Integration tests for ScopeMate"""
+"""Integration tests for scopemate"""
 import os
 import tempfile
 import pytest
