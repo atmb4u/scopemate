@@ -16,3 +16,5 @@ _clean/
 
 
 *.json
+.DS_Store
+*.md

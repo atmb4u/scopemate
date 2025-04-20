@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "scopemate"
-version = "0.1.0"
+version = "0.1.2"
 description = "🪜 A CLI tool for Purpose/Scope/Outcome planning"
 readme = "README.md"
 authors = [

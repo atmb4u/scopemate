@@ -9,12 +9,14 @@ outcome, and output file.
 import sys
 import argparse
 import uuid
+import json
+import os
 from typing import List
 
 from .models import (
     ScopeMateTask, Purpose, Scope, Outcome, Meta, get_utc_now
 )
-from .storage import save_plan
+from .storage import save_plan, save_markdown_plan, generate_markdown_from_json
 from .llm import estimate_scope, generate_title_from_purpose_outcome
 from .breakdown import suggest_breakdown
 from .task_analysis import check_and_update_parent_estimates
@@ -113,7 +115,7 @@ def command_line() -> None:
        
     2. Non-interactive mode (--purpose and --outcome): Creates a task directly
        from command-line arguments, generates subtasks using LLM, and saves the
-       resulting task hierarchy to a JSON file.
+       resulting task hierarchy to a JSON file with an automatic Markdown version.
        
     The function validates required arguments depending on the mode, provides
     helpful error messages when arguments are missing, and handles the entire
@@ -126,7 +128,7 @@ def command_line() -> None:
         --output: Path to save the output JSON file (default: scopemate_plan.json)
         
     Side Effects:
-        - May save task data to a file on disk
+        - Saves task data to a file on disk (both JSON and Markdown versions)
         - Prints progress and error messages to stdout
         - Exits with non-zero status code on errors
     
@@ -140,12 +142,12 @@ def command_line() -> None:
                  --outcome "Page load time under 2 seconds" \
                  --output "perf_project.json"
         ```
+        
+    Note: Markdown files are automatically generated with the same base name 
+    as the JSON file (e.g., "perf_project.md" for "perf_project.json").
     """
     parser = argparse.ArgumentParser(
-        description="🪜  scopemate v.0.1.0 - Break down complex projects with LLMs",
-        epilog="Purpose: why it matters\n"
-               "Outcome: what will change once it's done\n"
-               "Scope: how will be delivered (this is where LLM can help)",
+        description="🪜  scopemate - Break down complex projects with LLMs",
         formatter_class=argparse.RawTextHelpFormatter
     )
     
@@ -168,8 +170,9 @@ def command_line() -> None:
     parser.add_argument(
         "--output", 
         default="scopemate_plan.json",
-        help="JSON file to save the task breakdown and scope estimates (default: scopemate_plan.json)"
+        help="JSON file to save the task breakdown and scope estimates (default: scopemate_plan.json). A matching .md file will also be created."
     )
+
     args = parser.parse_args()
     
     # Check if running in interactive mode
@@ -193,8 +196,12 @@ def command_line() -> None:
     print("Generating subtasks...")
     all_tasks = process_task_with_breakdown(task)
     
-    # Save plan to output file
+    # Save plan to output file (this will also create the MD version)
     save_plan(all_tasks, args.output)
+    
+    # Show message about MD file creation
+    md_filename = os.path.splitext(args.output)[0] + ".md"
+    print(f"✅ Both JSON and Markdown versions have been saved. You can share {md_filename} with team members.")
 
 
 def main():

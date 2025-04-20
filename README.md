@@ -48,6 +48,7 @@ Scopemate is built around a three-part framework for strategic decision making:
 - Pydantic validation
 - Cross-platform support (Windows, macOS, Linux)
 - Works with Python 3.10 and above
+- Automatic Markdown export of plans for easy sharing
 
 ## Requirements
 
@@ -141,10 +142,9 @@ scopemate --help
 
 # Generate a project plan with purpose and outcome
 scopemate --purpose="Build a REST API for user management" --outcome="A documented API with authentication and user CRUD operations" --output="project_plan.json"
-
-# Fix inconsistent estimates in an existing plan
-scopemate --fix-estimates --input="project_plan.json" --output="fixed_plan.json"
 ```
+
+**Note:** A Markdown version of the output is automatically generated alongside the JSON file. For example, if you specify `--output="project_plan.json"`, a file named `project_plan.md` will also be created.
 
 ### Interactive Mode Workflow
 
@@ -175,7 +175,9 @@ The interactive mode (`scopemate --interactive`) will guide you through:
 
 ### Output Format
 
-scopemate generates a structured JSON output with the following format:
+scopemate generates both JSON and Markdown output files:
+
+1. **JSON Output** - Structured data format with the following structure:
 
 ```json
 {
@@ -214,6 +216,14 @@ scopemate generates a structured JSON output with the following format:
   ]
 }
 ```
+
+2. **Markdown Output** - Human-readable format automatically generated with the same basename as the JSON file. The Markdown output includes:
+   - A summary of the plan with task counts and complexity breakdown
+   - Hierarchical task structure preserving parent-child relationships
+   - All relevant task details formatted for easy reading
+   - Properly formatted sections for purpose, scope, outcome, and metadata
+
+This dual output approach makes it easy to both process the data programmatically (using the JSON) and share the plan with team members (using the Markdown).
 
 ### Integrating with Other Tools
 
