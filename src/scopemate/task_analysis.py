@@ -15,11 +15,30 @@ def check_and_update_parent_estimates(tasks: List[ScopeMateTask]) -> List[ScopeM
     """
     Check and update parent task estimates based on child task complexity.
     
+    This function ensures consistency in the task hierarchy by making sure that 
+    parent tasks have appropriate size and time estimates relative to their children.
+    If a child task has a higher complexity or longer time estimate than its parent,
+    the parent's estimates are automatically increased to maintain logical consistency.
+    
+    The function works by:
+    1. Creating maps of task IDs to task objects and parent IDs
+    2. Computing complexity values for all tasks based on their size and time estimates
+    3. Identifying inconsistencies where child tasks have higher complexity than parents
+    4. Updating parent estimates to match or exceed their children's complexity
+    5. Recursively propagating updates up the task hierarchy to maintain consistency
+    
     Args:
-        tasks: List of ScopeMateTask objects
+        tasks: List of ScopeMateTask objects to analyze and update
         
     Returns:
-        Updated list of ScopeMateTask objects
+        Updated list of ScopeMateTask objects with consistent parent-child estimates
+        
+    Example:
+        ```python
+        # Before: parent task has "straightforward" size but child has "complex" size
+        updated_tasks = check_and_update_parent_estimates(tasks)
+        # After: parent task is updated to "complex" or higher to maintain consistency
+        ```
     """
     # Create a map of tasks by ID for easy access
     task_map = {t.id: t for t in tasks}
@@ -229,14 +248,36 @@ def should_decompose_task(task: ScopeMateTask, depth: int, max_depth: int, is_le
     """
     Determine if a task should be broken down based on complexity and time estimates.
     
+    This function applies a set of heuristics to decide whether a task needs further
+    decomposition. The decision is based on multiple factors:
+    
+    1. Task depth in the hierarchy - tasks at or beyond max_depth are never decomposed
+    2. Task complexity - "complex", "uncertain", or "pioneering" tasks should be broken down
+    3. Time estimate - tasks with long durations should be broken down into smaller units
+    4. Leaf status - whether the task already has subtasks
+    
+    The breakdown logic implements a graduated approach where:
+    - Very complex tasks are always broken down (unless at max depth)
+    - Long duration tasks are broken down, especially if they're leaf tasks
+    - Tasks with "week" duration are broken down up to max_depth
+    - Tasks at depth 2+ with "sprint" duration aren't broken down (unless they're "multi-sprint")
+    
     Args:
         task: The ScopeMateTask to evaluate
-        depth: Current depth in the task hierarchy
-        max_depth: Maximum allowed depth
-        is_leaf: Whether this is a leaf task (has no children)
+        depth: Current depth in the task hierarchy (0 for root tasks)
+        max_depth: Maximum allowed depth for the task hierarchy
+        is_leaf: Whether this task currently has no children
         
     Returns:
-        True if the task should be broken down, False otherwise
+        True if the task should be broken down into subtasks, False otherwise
+        
+    Example:
+        ```python
+        task = get_task_by_id("TASK-123")
+        depth = get_task_depth(task, task_depths, tasks)
+        if should_decompose_task(task, depth, max_depth=5, is_leaf=True):
+            subtasks = suggest_breakdown(task)
+        ```
     """
     # Always respect max depth limit
     if depth >= max_depth:

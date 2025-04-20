@@ -21,11 +21,39 @@ def suggest_breakdown(task: ScopeMateTask) -> List[ScopeMateTask]:
     """
     Use LLM to suggest a breakdown of a task into smaller subtasks.
     
+    This function is a critical part of the scopemate workflow. It uses a Large Language
+    Model to analyze a task and suggest appropriate subtasks that collectively accomplish
+    the parent task's goal. The function handles both complexity-based and time-based
+    breakdowns, ensuring that complex tasks are simplified and long-duration tasks are
+    broken into manageable timeframes.
+    
+    The function works through these stages:
+    1. Analyze if the breakdown is needed due to complexity or time duration
+    2. Formulate a specialized prompt for the LLM with appropriate constraints
+    3. Process the LLM's response to extract valid subtask definitions
+    4. Convert the raw LLM output into proper ScopeMateTask objects
+    5. Present the suggestions to the user through an interactive selection process
+    
+    The subtasks generated are guaranteed to be:
+    - Smaller in scope than the parent task
+    - Less complex than the parent task
+    - Shorter in duration than the parent task
+    - Collectivey covering all aspects needed to accomplish the parent task
+    
     Args:
-        task: The ScopeMateTask to break down
+        task: The ScopeMateTask to break down into smaller subtasks
         
     Returns:
-        List of ScopeMateTask objects representing subtasks
+        List of ScopeMateTask objects representing the subtasks, after user interaction
+        
+    Example:
+        ```python
+        parent_task = get_task_by_id("TASK-123")
+        subtasks = suggest_breakdown(parent_task)
+        if subtasks:
+            print(f"Created {len(subtasks)} subtasks")
+            tasks.extend(subtasks)
+        ```
     """
     # Check if we're breaking down due to size complexity or time estimate
     is_complex = task.scope.size in ["complex", "uncertain", "pioneering"]

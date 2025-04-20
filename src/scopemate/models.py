@@ -144,7 +144,69 @@ class Meta(BaseModel):
 
 
 class ScopeMateTask(BaseModel):
-    """A Purpose/Context/Outcome task representing a unit of work."""
+    """
+    A Purpose/Context/Outcome task representing a unit of work.
+    
+    ScopeMateTask is the core data model in scopemate, representing a single unit of work
+    with well-defined purpose, scope, and outcome. The model follows a comprehensive and
+    structured approach to task definition that ensures clarity in task planning and execution.
+    
+    Each task has:
+    1. Purpose - the "why" behind the task (detailed_description, alignment, urgency)
+    2. Scope - the "how big" and "what's involved" (size, time_estimate, dependencies, risks)
+    3. Outcome - the "what will be delivered" (type, definition, acceptance criteria, metrics)
+    4. Meta - tracking information (status, priority, dates, confidence, team)
+    
+    Tasks can form a hierarchical structure through the parent_id field, allowing complex
+    work to be broken down into manageable subtasks. The hierarchy supports:
+    - Parent tasks: higher-level tasks that can be decomposed
+    - Child tasks: more specific tasks that contribute to a parent
+    - Root tasks: top-level tasks with no parent
+    - Leaf tasks: tasks with no children
+    
+    The model enforces validation rules through Pydantic, ensuring data integrity
+    across all fields (e.g., valid size values, time estimates, status, etc.).
+    
+    Attributes:
+        id (str): Unique identifier for the task
+        title (str): Short descriptive title
+        purpose (Purpose): Why the task matters
+        scope (Scope): Size, time, dependencies and risks
+        outcome (Outcome): Delivered value and validation methods
+        meta (Meta): Status, timing, and tracking information
+        parent_id (Optional[str]): ID of parent task if this is a subtask
+        
+    Example:
+        ```python
+        task = ScopeMateTask(
+            id="TASK-abc123",
+            title="Implement user authentication",
+            purpose=Purpose(
+                detailed_description="We need secure authentication for users",
+                alignment=["Security", "User experience"],
+                urgency="strategic"
+            ),
+            scope=Scope(
+                size="complex",
+                time_estimate="sprint",
+                dependencies=["API design", "Database setup"],
+                risks=["Security vulnerabilities", "Performance issues"]
+            ),
+            outcome=Outcome(
+                type="customer-facing",
+                detailed_outcome_definition="Complete authentication system with login/logout",
+                acceptance_criteria=["User can log in", "User can log out", "Password reset works"]
+            ),
+            meta=Meta(
+                status="backlog",
+                priority=1,
+                created=get_utc_now(),
+                updated=get_utc_now(),
+                team="Backend"
+            )
+        )
+        ```
+    """
     id: str
     title: str = Field(..., description="Short descriptive title")
     purpose: Purpose

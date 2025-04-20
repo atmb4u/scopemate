@@ -101,7 +101,46 @@ def process_task_with_breakdown(task: ScopeMateTask) -> List[ScopeMateTask]:
 
 
 def command_line() -> None:
-    """Process command line arguments and execute appropriate actions."""
+    """
+    Process command line arguments and execute appropriate actions.
+    
+    This function is the primary entry point for the scopemate CLI, responsible 
+    for parsing command-line arguments and routing execution to the appropriate
+    workflow based on those arguments. It supports two main modes of operation:
+    
+    1. Interactive mode (--interactive): Launches the full guided workflow with
+       the TaskEngine for an interactive task creation and breakdown experience.
+       
+    2. Non-interactive mode (--purpose and --outcome): Creates a task directly
+       from command-line arguments, generates subtasks using LLM, and saves the
+       resulting task hierarchy to a JSON file.
+       
+    The function validates required arguments depending on the mode, provides
+    helpful error messages when arguments are missing, and handles the entire
+    lifecycle of task creation, breakdown, and saving in non-interactive mode.
+    
+    Command line arguments:
+        --interactive: Flag to launch interactive workflow
+        --purpose: Text describing why the task matters (required in non-interactive mode)
+        --outcome: Text describing what will be delivered (required in non-interactive mode)
+        --output: Path to save the output JSON file (default: scopemate_plan.json)
+        
+    Side Effects:
+        - May save task data to a file on disk
+        - Prints progress and error messages to stdout
+        - Exits with non-zero status code on errors
+    
+    Example Usage:
+        ```bash
+        # Interactive mode
+        scopemate --interactive
+        
+        # Non-interactive mode
+        scopemate --purpose "Improve website performance" \
+                 --outcome "Page load time under 2 seconds" \
+                 --output "perf_project.json"
+        ```
+    """
     parser = argparse.ArgumentParser(
         description="🪜  scopemate v.0.1.0 - Break down complex projects with LLMs",
         epilog="Purpose: why it matters\n"

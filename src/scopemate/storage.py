@@ -37,9 +37,29 @@ def save_plan(tasks: List[ScopeMateTask], filename: str) -> None:
     """
     Save tasks to a plan file.
     
+    This function serializes a list of ScopeMateTask objects to JSON and writes them
+    to a file. The file format uses a consistent structure with a top-level "tasks"
+    array containing serialized task objects. This ensures compatibility with other
+    tooling and future versions of scopemate.
+    
+    The function handles all serialization details including proper encoding and
+    indentation for readability. Each task is completely serialized with all its
+    nested structures (purpose, scope, outcome, meta) for complete persistence.
+    
     Args:
-        tasks: List of ScopeMateTask objects to save
+        tasks: List of ScopeMateTask objects to save to disk
         filename: Path to save the plan file
+        
+    Side Effects:
+        - Writes to file system at the specified path
+        - Prints confirmation message upon successful save
+        
+    Example:
+        ```python
+        tasks = [task1, task2, task3]  # List of ScopeMateTask objects
+        save_plan(tasks, "project_alpha_plan.json")
+        # Saves all tasks to project_alpha_plan.json with proper formatting
+        ```
     """
     payload = {"tasks": [t.model_dump() for t in tasks]}
     with open(filename, "w", encoding="utf-8") as f:
@@ -51,14 +71,40 @@ def load_plan(filename: str) -> List[ScopeMateTask]:
     """
     Load tasks from a plan file.
     
+    This function reads a JSON file containing serialized tasks and deserializes them
+    into ScopeMateTask objects. It handles various backward compatibility issues and
+    performs validation on the loaded data to ensure integrity.
+    
+    The function is robust against various common issues:
+    - It properly handles missing parent_id fields for backward compatibility
+    - It removes legacy fields that may exist in older files
+    - It skips invalid tasks with validation errors rather than failing entirely
+    - It provides clear warnings about skipped tasks
+    
     Args:
-        filename: Path to the plan file
+        filename: Path to the plan file to load
         
     Returns:
-        List of ScopeMateTask objects
+        List of validated ScopeMateTask objects from the file
         
     Raises:
-        FileNotFoundError: If the file doesn't exist
+        FileNotFoundError: If the specified file doesn't exist
+        
+    Example:
+        ```python
+        try:
+            tasks = load_plan("project_alpha_plan.json")
+            print(f"Loaded {len(tasks)} tasks successfully")
+            
+            # Process loaded tasks
+            for task in tasks:
+                if task.meta.status == "backlog":
+                    # Do something with backlog tasks...
+                    pass
+        except FileNotFoundError:
+            print("Plan file not found, starting with empty task list")
+            tasks = []
+        ```
     """
     if not os.path.exists(filename):
         raise FileNotFoundError(f"File not found: {filename}")

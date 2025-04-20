@@ -26,12 +26,45 @@ def call_llm(prompt: str, model: str = DEFAULT_MODEL) -> dict:
     """
     Invoke LLM to get a structured JSON response.
     
+    This function is the core LLM integration point for scopemate, handling all
+    communication with the OpenAI API. It's designed to always return structured
+    JSON data that can be easily processed by the application.
+    
+    The function:
+    1. Creates an OpenAI client using the default API credentials
+    2. Configures a system prompt that instructs the model to return valid JSON
+    3. Sends the user's prompt with the task-specific instructions
+    4. Sets response_format to force JSON output
+    5. Parses and returns the JSON response
+    
+    Error handling is built in to gracefully handle JSON parsing failures by
+    printing diagnostic information and returning an empty dictionary rather
+    than crashing.
+    
     Args:
-        prompt: The prompt to send to the LLM
-        model: The model to use (defaults to DEFAULT_MODEL)
+        prompt (str): The prompt to send to the LLM, containing full instructions
+                      and any task data needed for context
+        model (str): The OpenAI model identifier to use (defaults to DEFAULT_MODEL)
         
     Returns:
-        A dictionary containing the parsed JSON response
+        dict: A dictionary containing the parsed JSON response from the LLM.
+              Returns an empty dict {} if parsing fails.
+              
+    Example:
+        ```python
+        # Create a prompt asking for task breakdown
+        prompt = f"Break down this task into subtasks: {task.title}"
+        
+        # Call the LLM and get structured data back
+        response = call_llm(prompt)
+        
+        # Process the structured response
+        if "subtasks" in response:
+            for subtask_data in response["subtasks"]:
+                # Create a new subtask from the data
+                subtask = ScopeMateTask(**subtask_data)
+                tasks.append(subtask)
+        ```
     """
     client = OpenAI()
     response = client.chat.completions.create(

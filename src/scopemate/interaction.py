@@ -25,13 +25,43 @@ def prompt_user(
     """
     Prompt user for input with optional default and choices validation.
     
+    This function is the primary method for all user interaction in scopemate. It
+    handles displaying prompts, validating input against constraints, and providing
+    default values when the user presses Enter without typing anything.
+    
+    The function implements a validation loop that ensures users can only provide
+    valid input. If choices are specified, the function performs case-insensitive
+    validation against those choices and re-prompts when input is invalid.
+    
+    Features:
+    - Displays a prompt with an optional default value in square brackets
+    - Supports empty input with a default fallback value
+    - Validates input against a predefined set of case-insensitive choices
+    - Provides clear error messages when input doesn't match required choices
+    - Loops until valid input is received
+    
     Args:
-        prompt: The prompt text to display
-        default: Optional default value if user enters nothing
-        choices: Optional list of valid choices
+        prompt (str): The prompt text to display to the user
+        default (Optional[str]): Default value to use if user submits empty input
+        choices (Optional[List[str]]): List of valid input choices for validation
         
     Returns:
-        User's validated input as a string
+        str: The validated user input
+        
+    Example:
+        ```python
+        # Simple prompt with no constraints
+        name = prompt_user("Enter your name")
+        
+        # Prompt with a default value
+        team = prompt_user("Select team", default="Backend")
+        
+        # Prompt with choices validation
+        response = prompt_user("Continue?", default="y", choices=["y", "n"])
+        if response.lower() == "y":
+            # Proceed with action
+            pass
+        ```
     """
     while True:
         suffix = f" [{default}]" if default is not None else ""
