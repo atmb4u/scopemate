@@ -1,0 +1,15 @@
+-r requirements.txt
+
+# Testing
+pytest>=7.3.1
+pytest-cov>=4.1.0
+pytest-mock>=3.10.0
+
+# Development tools
+ruff>=0.1.0
+twine>=4.0.2
+build>=1.0.0
+
+# Documentation
+mkdocs>=1.4.3
+mkdocs-material>=9.1.15 
