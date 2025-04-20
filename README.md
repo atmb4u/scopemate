@@ -275,6 +275,23 @@ uv pip install -r requirements-dev.txt
 uv pip install -e .
 ```
 
+#### Using pipx
+
+[pipx](https://github.com/pypa/pipx) is useful for installing and running Python applications in isolated environments:
+
+```bash
+# Install pipx if you don't have it
+pip install pipx
+
+# Clone the repository
+git clone https://github.com/atmb4u/scopemate.git
+cd scopemate
+
+# Install the package in development mode with force flag
+# This is useful when making changes and wanting to test the CLI immediately
+pipx install --force .
+```
+
 ### Running Tests
 
 ```bash
