@@ -53,7 +53,10 @@ Scopemate is built around a three-part framework for strategic decision making:
 ## Requirements
 
 - Python 3.10 or higher
-- OpenAI API key set as environment variable (`OPENAI_API_KEY`)
+- An API key for one of the supported LLM providers:
+  - OpenAI API key (default)
+  - Google AI (Gemini) API key
+  - Anthropic (Claude) API key
 
 ## Installation
 
@@ -104,26 +107,123 @@ cd scopemate
 pip install -e .
 ```
 
-### Setting up the OpenAI API Key
+### Setting up API Keys
 
-scopemate requires an OpenAI API key to function. Set it as an environment variable:
+scopemate now supports multiple LLM providers. Set up the API key for your preferred provider:
 
-#### macOS/Linux
+#### OpenAI (Default)
+
+Set the OpenAI API key as an environment variable:
+
+##### macOS/Linux
 ```bash
 export OPENAI_API_KEY=your-api-key-here
 ```
 
-#### Windows Command Prompt
+##### Windows Command Prompt
 ```cmd
 set OPENAI_API_KEY=your-api-key-here
 ```
 
-#### Windows PowerShell
+##### Windows PowerShell
 ```powershell
 $env:OPENAI_API_KEY = "your-api-key-here"
 ```
 
-For permanent setup, add this to your shell profile or environment variables.
+#### Google AI (Gemini)
+
+Set the Google AI API key as an environment variable:
+
+##### macOS/Linux
+```bash
+export GEMINI_API_KEY=your-api-key-here
+```
+
+##### Windows Command Prompt
+```cmd
+set GEMINI_API_KEY=your-api-key-here
+```
+
+##### Windows PowerShell
+```powershell
+$env:GEMINI_API_KEY = "your-api-key-here"
+```
+
+#### Anthropic (Claude)
+
+Set the Anthropic API key as an environment variable:
+
+##### macOS/Linux
+```bash
+export ANTHROPIC_API_KEY=your-api-key-here
+```
+
+##### Windows Command Prompt
+```cmd
+set ANTHROPIC_API_KEY=your-api-key-here
+```
+
+##### Windows PowerShell
+```powershell
+$env:ANTHROPIC_API_KEY = "your-api-key-here"
+```
+
+### Selecting LLM Provider
+
+You can select which LLM provider to use by setting the `SCOPEMATE_LLM_PROVIDER` environment variable:
+
+#### macOS/Linux
+```bash
+# Use OpenAI (default)
+export SCOPEMATE_LLM_PROVIDER=OPENAI
+
+# Use Gemini
+export SCOPEMATE_LLM_PROVIDER=GEMINI
+
+# Use Claude
+export SCOPEMATE_LLM_PROVIDER=CLAUDE
+```
+
+#### Windows Command Prompt
+```cmd
+# Use OpenAI (default)
+set SCOPEMATE_LLM_PROVIDER=OPENAI
+
+# Use Gemini
+set SCOPEMATE_LLM_PROVIDER=GEMINI
+
+# Use Claude
+set SCOPEMATE_LLM_PROVIDER=CLAUDE
+```
+
+#### Windows PowerShell
+```powershell
+# Use OpenAI (default)
+$env:SCOPEMATE_LLM_PROVIDER = "OPENAI"
+
+# Use Gemini
+$env:SCOPEMATE_LLM_PROVIDER = "GEMINI"
+
+# Use Claude
+$env:SCOPEMATE_LLM_PROVIDER = "CLAUDE"
+```
+
+### Selecting Model
+
+You can also specify which model to use for each provider:
+
+```bash
+# OpenAI model (default is o4-mini)
+export SCOPEMATE_OPENAI_MODEL=gpt-4-turbo
+
+# Gemini model (default is gemini-flash)
+export SCOPEMATE_GEMINI_MODEL=gemini-2.0-flash
+
+# Claude model (default is claude-3-haiku-20240307)
+export SCOPEMATE_CLAUDE_MODEL=claude-3-7-sonnet-20250219
+```
+
+For permanent setup, add these environment variables to your shell profile or system environment variables.
 
 ## Usage
 

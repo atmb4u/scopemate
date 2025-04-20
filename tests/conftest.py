@@ -228,4 +228,69 @@ def disable_input_output(monkeypatch):
     monkeypatch.setattr('builtins.input', lambda prompt: '')
     
     # Mock print function
-    monkeypatch.setattr('builtins.print', lambda *args, **kwargs: None) 
+    monkeypatch.setattr('builtins.print', lambda *args, **kwargs: None)
+
+
+@pytest.fixture
+def mock_llm_provider():
+    """
+    Mock the _call_provider function to avoid actual API calls during testing.
+    
+    This provides a simpler interface for testing code that uses the LLM module
+    without needing to mock multiple provider-specific functions.
+    
+    Returns a tuple of (mock_patch, mock_object) that can be used to configure
+    responses for different test scenarios.
+    """
+    with patch('scopemate.llm._call_provider') as mock_provider:
+        # Default to returning a simple JSON structure
+        mock_provider.return_value = '{"result": "success"}'
+        yield mock_provider
+
+
+@pytest.fixture
+def mock_llm_json(mock_llm_provider):
+    """
+    Mock LLM JSON responses for testing.
+    
+    This fixture builds on mock_llm_provider to specifically handle JSON responses
+    through the call_llm function. It patches the underlying provider function
+    and sets up the returned JSON to be easily configurable.
+    
+    Returns the mock object that can be configured with custom return values.
+    """
+    with patch('scopemate.llm.call_llm') as mock_call_llm:
+        # Set up a default response
+        mock_call_llm.return_value = {"result": "success"}
+        yield mock_call_llm
+
+
+@pytest.fixture
+def mock_llm_text(mock_llm_provider):
+    """
+    Mock LLM text responses for testing.
+    
+    This fixture builds on mock_llm_provider to specifically handle text responses
+    through the call_llm_text function. It patches the call_llm_text function
+    to avoid making actual API calls.
+    
+    Returns the mock object that can be configured with custom return values.
+    """
+    with patch('scopemate.llm.call_llm_text') as mock_call_llm_text:
+        # Set up a default response
+        mock_call_llm_text.return_value = "Mock text response"
+        yield mock_call_llm_text 
+
+
+@pytest.fixture
+def mock_call_llm():
+    """
+    Backward compatibility fixture for tests that use mock_call_llm directly.
+    
+    This simply exposes the mock_llm_json fixture with a different name to
+    maintain compatibility with existing tests.
+    """
+    with patch('scopemate.llm.call_llm') as mock_call:
+        # Default response
+        mock_call.return_value = {"result": "success"}
+        yield mock_call 

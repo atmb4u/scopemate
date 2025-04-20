@@ -6,8 +6,14 @@ This module provides functions for interacting with LLMs for task estimation,
 breakdown, and optimization.
 """
 import json
+import os
 from typing import Dict, Any, List, Optional
+from enum import Enum, auto
+
+# Import LLM providers
 from openai import OpenAI
+import google.generativeai as genai
+from anthropic import Anthropic
 
 from .models import (
     ScopeMateTask, Scope, TIME_COMPLEXITY, SIZE_COMPLEXITY,
@@ -17,25 +23,68 @@ from .models import (
 # -------------------------------
 # Configuration
 # -------------------------------
-DEFAULT_MODEL = "o4-mini"
+class LLMProvider(Enum):
+    """Supported LLM providers"""
+    OPENAI = auto()
+    GEMINI = auto()
+    CLAUDE = auto()
+
+# Default configuration
+DEFAULT_PROVIDER = LLMProvider.OPENAI
+DEFAULT_OPENAI_MODEL = "o4-mini"
+DEFAULT_GEMINI_MODEL = "gemini-2.0-flash"
+DEFAULT_CLAUDE_MODEL = "claude-3-7-sonnet-20250219"
+
+# Provider-specific model mapping
+DEFAULT_MODELS = {
+    LLMProvider.OPENAI: DEFAULT_OPENAI_MODEL,
+    LLMProvider.GEMINI: DEFAULT_GEMINI_MODEL,
+    LLMProvider.CLAUDE: DEFAULT_CLAUDE_MODEL
+}
+
+# Get provider from environment variable or use default
+def get_llm_provider() -> LLMProvider:
+    """Get the LLM provider from environment variable or use default"""
+    provider_str = os.environ.get("SCOPEMATE_LLM_PROVIDER", "").upper()
+    if provider_str == "OPENAI":
+        return LLMProvider.OPENAI
+    elif provider_str == "GEMINI":
+        return LLMProvider.GEMINI
+    elif provider_str == "CLAUDE": 
+        return LLMProvider.CLAUDE
+    return DEFAULT_PROVIDER
+
+# Get model for the provider from environment variable or use default
+def get_llm_model(provider: LLMProvider = None) -> str:
+    """Get the LLM model for the provider from environment variable or use default"""
+    if provider is None:
+        provider = get_llm_provider()
+    
+    if provider == LLMProvider.OPENAI:
+        return os.environ.get("SCOPEMATE_OPENAI_MODEL", DEFAULT_OPENAI_MODEL)
+    elif provider == LLMProvider.GEMINI:
+        return os.environ.get("SCOPEMATE_GEMINI_MODEL", DEFAULT_GEMINI_MODEL)
+    elif provider == LLMProvider.CLAUDE:
+        return os.environ.get("SCOPEMATE_CLAUDE_MODEL", DEFAULT_CLAUDE_MODEL)
+    
+    return DEFAULT_MODELS[DEFAULT_PROVIDER]
 
 # -------------------------------
 # LLM Interaction
 # -------------------------------
-def call_llm(prompt: str, model: str = DEFAULT_MODEL) -> dict:
+def call_llm(prompt: str, system_prompt: str = None, model: str = None, provider: LLMProvider = None) -> dict:
     """
     Invoke LLM to get a structured JSON response.
     
     This function is the core LLM integration point for scopemate, handling all
-    communication with the OpenAI API. It's designed to always return structured
+    communication with the supported LLM APIs. It's designed to always return structured
     JSON data that can be easily processed by the application.
     
     The function:
-    1. Creates an OpenAI client using the default API credentials
+    1. Creates a client for the selected provider (OpenAI, Gemini, or Claude)
     2. Configures a system prompt that instructs the model to return valid JSON
     3. Sends the user's prompt with the task-specific instructions
-    4. Sets response_format to force JSON output
-    5. Parses and returns the JSON response
+    4. Parses and returns the JSON response
     
     Error handling is built in to gracefully handle JSON parsing failures by
     printing diagnostic information and returning an empty dictionary rather
@@ -44,50 +93,188 @@ def call_llm(prompt: str, model: str = DEFAULT_MODEL) -> dict:
     Args:
         prompt (str): The prompt to send to the LLM, containing full instructions
                       and any task data needed for context
-        model (str): The OpenAI model identifier to use (defaults to DEFAULT_MODEL)
+        model (str, optional): The model identifier to use (defaults to provider's default model)
+        provider (LLMProvider, optional): The LLM provider to use (defaults to configured provider)
         
     Returns:
         dict: A dictionary containing the parsed JSON response from the LLM.
               Returns an empty dict {} if parsing fails.
-              
-    Example:
-        ```python
-        # Create a prompt asking for task breakdown
-        prompt = f"Break down this task into subtasks: {task.title}"
-        
-        # Call the LLM and get structured data back
-        response = call_llm(prompt)
-        
-        # Process the structured response
-        if "subtasks" in response:
-            for subtask_data in response["subtasks"]:
-                # Create a new subtask from the data
-                subtask = ScopeMateTask(**subtask_data)
-                tasks.append(subtask)
-        ```
     """
-    client = OpenAI()
-    response = client.chat.completions.create(
-        model=model,
-        messages=[
-            {
-                "role": "system", 
-                "content": "You are a JSON assistant specialized in structured data for product management tasks. "
-                           "Respond only with valid JSON. Follow the exact requested format in the user's prompt, "
-                           "using the exact field names and adhering to all constraints on field values."
-            },
-            {"role": "user", "content": prompt}
-        ],
-        response_format={"type": "json_object"}
-    )
+    # Determine which provider to use
+    if provider is None:
+        provider = get_llm_provider()
     
+    # Determine which model to use
+    if model is None:
+        model = get_llm_model(provider)
+    
+    # System prompt is common across providers
+    if system_prompt is None:
+        system_prompt = (
+            "You are a JSON assistant specialized in structured data for product management tasks. "
+            "Respond only with valid JSON. Follow the exact requested format in the user's prompt, "
+            "using the exact field names and adhering to all constraints on field values."
+        )
+    
+    # Call the appropriate provider with JSON response format
+    response_text = _call_provider(prompt, system_prompt, model, provider, response_format="json")
+    
+    # Parse JSON response
     try:
-        return json.loads(response.choices[0].message.content)
+        if response_text:
+            return json.loads(response_text)
+        return {}
     except json.JSONDecodeError as e:
         print(f"[Error] Failed to parse LLM response as JSON: {e}")
-        print(f"Raw response: {response.choices[0].message.content}")
+        print(f"Raw response: {response_text}")
         return {}
 
+def call_llm_text(prompt: str, system_prompt: str = None, model: str = None, provider: LLMProvider = None) -> str:
+    """
+    Invoke LLM to get a plain text response (not JSON).
+    
+    This is similar to call_llm but returns plain text instead of JSON.
+    
+    Args:
+        prompt (str): The prompt to send to the LLM
+        system_prompt (str, optional): The system prompt to use
+        model (str, optional): The model identifier to use (defaults to provider's default model)
+        provider (LLMProvider, optional): The LLM provider to use (defaults to configured provider)
+        
+    Returns:
+        str: The text response from the LLM, or empty string on error
+    """
+    # Determine which provider to use
+    if provider is None:
+        provider = get_llm_provider()
+    
+    # Determine which model to use
+    if model is None:
+        model = get_llm_model(provider)
+    
+    # System prompt is common across providers
+    if system_prompt is None:
+        system_prompt = (
+            "You are a helpful assistant that provides clear and concise answers. "
+            "Respond directly to the question without adding additional explanation or context."
+        )
+    
+    print(f"Calling LLM (text mode) with provider: {provider}, model: {model}")
+    
+    # Call the appropriate provider with text response format
+    return _call_provider(prompt, system_prompt, model, provider, response_format="text")
+
+def _call_provider(prompt: str, system_prompt: str, model: str, provider: LLMProvider, response_format: str = "json") -> str:
+    """
+    Internal helper function to call the appropriate LLM provider.
+    
+    Args:
+        prompt (str): The prompt to send to the LLM
+        system_prompt (str): The system prompt to use
+        model (str): The model to use
+        provider (LLMProvider): The provider to use
+        response_format (str): Either "json" or "text"
+        
+    Returns:
+        str: The raw text response from the LLM
+    """
+    try:
+        if provider == LLMProvider.OPENAI:
+            return _call_openai_provider(prompt, system_prompt, model, response_format)
+        elif provider == LLMProvider.GEMINI:
+            return _call_gemini_provider(prompt, system_prompt, model, response_format)
+        elif provider == LLMProvider.CLAUDE:
+            return _call_claude_provider(prompt, system_prompt, model, response_format)
+        
+        # Fallback to OpenAI if unknown provider
+        print(f"[Warning] Unknown provider {provider}, falling back to OpenAI")
+        return _call_openai_provider(prompt, system_prompt, DEFAULT_OPENAI_MODEL, response_format)
+    except Exception as e:
+        print(f"[Error] LLM API call failed: {e}")
+        return ""
+
+def _call_openai_provider(prompt: str, system_prompt: str, model: str, response_format: str) -> str:
+    """Internal helper function to call OpenAI API"""
+    try:
+        client = OpenAI()
+        
+        # Configure response format for JSON if requested
+        kwargs = {}
+        if response_format == "json":
+            kwargs["response_format"] = {"type": "json_object"}
+        
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt}
+            ],
+            **kwargs
+        )
+        
+        # Return raw content text
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"[Error] OpenAI API call failed: {e}")
+        return ""
+
+def _call_gemini_provider(prompt: str, system_prompt: str, model: str, response_format: str) -> str:
+    """Internal helper function to call Gemini API"""
+    try:
+        # Check for API key in environment
+        api_key = os.environ.get("GEMINI_API_KEY", None)
+        if not api_key:
+            print("[Error] No API key found for Gemini. Set GEMINI_API_KEY environment variable.")
+            return ""
+        # Initialize the Gemini client
+        genai.configure(api_key=api_key)
+        
+        # Since system role is not supported, combine system prompt and user prompt
+        combined_prompt = f"{system_prompt}\n\n{prompt}"
+        
+        # Configure response format for JSON if requested
+        generation_config = {}
+        if response_format == "json":
+            generation_config["response_mime_type"] = "application/json"
+        
+        # Generate response using Gemini
+        model_name = model if model != system_prompt else DEFAULT_GEMINI_MODEL
+        model_obj = genai.GenerativeModel(model_name=model_name, generation_config=generation_config)
+        response = model_obj.generate_content(combined_prompt)
+        
+        text = response.text.strip()
+        
+        # Remove quotes if present for text responses
+        if response_format == "text" and text.startswith('"') and text.endswith('"'):
+            text = text[1:-1]
+            
+        return text
+    except Exception as e:
+        print(f"[Error] Gemini API call failed: {e}")
+        return ""
+
+def _call_claude_provider(prompt: str, system_prompt: str, model: str, response_format: str) -> str:
+    """Internal helper function to call Claude API"""
+    try:
+        client = Anthropic()
+        
+        # Configure temperature - lower for JSON for more deterministic output
+        temperature = 0.1 if response_format == "json" else 0.2
+        
+        response = client.messages.create(
+            model=model,
+            system=system_prompt,
+            max_tokens=4096,
+            messages=[
+                {"role": "user", "content": prompt}
+            ],
+            temperature=temperature
+        )
+        
+        return response.content[0].text.strip()
+    except Exception as e:
+        print(f"[Error] Claude API call failed: {e}")
+        return ""
 
 def estimate_scope(task: ScopeMateTask) -> Scope:
     """
@@ -340,35 +527,34 @@ def update_parent_with_child_context(parent_task: ScopeMateTask, child_task: Sco
     return updated_parent
 
 
-def generate_title_from_purpose_outcome(purpose: str, outcome: str) -> str:
+def generate_title_from_purpose_outcome(purpose: str, outcome: str, model: str = None, provider: LLMProvider = None) -> str:
     """
     Use LLM to generate a concise title from purpose and outcome descriptions.
     
     Args:
         purpose: The purpose description
         outcome: The outcome description
+        model (str, optional): The model identifier to use (defaults to provider's default model)
+        provider (LLMProvider, optional): The LLM provider to use (defaults to configured provider)
         
     Returns:
         A concise title string
     """
-    client = OpenAI()
-    response = client.chat.completions.create(
-        model=DEFAULT_MODEL,
-        messages=[
-            {
-                "role": "system", 
-                "content": "You are a concise title generator. Generate a brief, clear title (maximum 60 characters) "
-                          "that captures the essence of a task based on its purpose and outcome description."
-            },
-            {
-                "role": "user", 
-                "content": f"Purpose: {purpose}\n\nOutcome: {outcome}\n\nGenerate a concise title (max 60 chars):"
-            }
-        ]
+    system_prompt = (
+        "You are a concise title generator. Generate a brief, clear title (maximum 60 characters) "
+        "that captures the essence of a task based on its purpose and outcome description. "
+        "Return ONLY the title with no additional text or quotes."
     )
     
-    # Extract title from LLM response
-    title = response.choices[0].message.content.strip()
+    user_prompt = f"Purpose: {purpose}\n\nOutcome: {outcome}\n\nGenerate a concise title (max 60 chars):"
+    
+    # Use the common text-based LLM function
+    title = call_llm_text(user_prompt, system_prompt, model, provider)
+    
+    # Handle empty response
+    if not title:
+        return "Task Title"
+    
     # Limit title length if needed
     if len(title) > 60:
         title = title[:57] + "..."

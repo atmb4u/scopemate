@@ -16,26 +16,36 @@ from scopemate.cli import (
 @pytest.fixture
 def mock_llm_for_cli():
     """Mock LLM functions for CLI testing"""
-    # Mock estimate_scope
-    with patch('scopemate.cli.estimate_scope') as mock_estimate:
-        # Return the scope unchanged for simplicity
-        mock_estimate.side_effect = lambda task: task.scope
+    # Mock call_llm for JSON responses
+    with patch('scopemate.llm.call_llm') as mock_call_llm:
+        # Default JSON response for any LLM call
+        mock_call_llm.return_value = {"result": "success"}
         
-        # Mock generate_title_from_purpose_outcome
-        with patch('scopemate.cli.generate_title_from_purpose_outcome') as mock_title:
-            mock_title.return_value = "CLI Generated Title"
+        # Mock call_llm_text for text responses
+        with patch('scopemate.llm.call_llm_text') as mock_call_llm_text:
+            # Default text response
+            mock_call_llm_text.return_value = "CLI Generated Title"
             
-            # Mock suggest_breakdown
-            with patch('scopemate.cli.suggest_breakdown') as mock_breakdown:
-                # Return empty list of subtasks for simplicity
-                mock_breakdown.return_value = []
+            # Mock estimate_scope
+            with patch('scopemate.cli.estimate_scope') as mock_estimate:
+                # Return the scope unchanged for simplicity
+                mock_estimate.side_effect = lambda task: task.scope
                 
-                # Mock check_and_update_parent_estimates
-                with patch('scopemate.cli.check_and_update_parent_estimates') as mock_check:
-                    # Return the tasks unchanged
-                    mock_check.side_effect = lambda tasks: tasks
+                # Mock generate_title_from_purpose_outcome
+                with patch('scopemate.cli.generate_title_from_purpose_outcome') as mock_title:
+                    mock_title.return_value = "CLI Generated Title"
                     
-                    yield
+                    # Mock suggest_breakdown
+                    with patch('scopemate.cli.suggest_breakdown') as mock_breakdown:
+                        # Return empty list of subtasks for simplicity
+                        mock_breakdown.return_value = []
+                        
+                        # Mock check_and_update_parent_estimates
+                        with patch('scopemate.cli.check_and_update_parent_estimates') as mock_check:
+                            # Return the tasks unchanged
+                            mock_check.side_effect = lambda tasks: tasks
+                            
+                            yield
 
 
 def test_create_task_from_args(mock_llm_for_cli):

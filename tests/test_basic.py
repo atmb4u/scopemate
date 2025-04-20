@@ -5,7 +5,7 @@ from scopemate import __version__
 
 def test_version():
     """Test that version is set correctly"""
-    assert __version__ == "0.1.1"
+    assert __version__ == "0.1.2"
 
 
 def test_imports():
