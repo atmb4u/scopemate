@@ -154,23 +154,23 @@ def command_line() -> None:
     parser.add_argument(
         "--interactive",
         action="store_true",
-        help="Launch guided workflow to define task, generate LLM-powered breakdowns, and estimate scope"
+        help="💡 Interactive mode"
     )
     
     parser.add_argument(
         "--outcome", 
-        help="🎯 Outcome: Clearly define what will be delivered and how success will be measured (asks: What will change once this is done?)"
+        help="🎯 What will change once this is done?"
     )
 
     parser.add_argument(
         "--purpose", 
-        help="🧭 Purpose: Clearly define why this project matters strategically (asks: Why does this matter now?)"
+        help="🧭 Why does this matter now?"
     )
     
     parser.add_argument(
         "--output", 
         default="scopemate_plan.json",
-        help="JSON file to save the task breakdown and scope estimates (default: scopemate_plan.json). A matching .md file will also be created."
+        help="🗂️  (default: scopemate_plan.json)"
     )
 
     args = parser.parse_args()
