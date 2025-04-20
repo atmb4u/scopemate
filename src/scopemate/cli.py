@@ -103,31 +103,34 @@ def process_task_with_breakdown(task: ScopeMateTask) -> List[ScopeMateTask]:
 def command_line() -> None:
     """Process command line arguments and execute appropriate actions."""
     parser = argparse.ArgumentParser(
-        description="🪜 scopemate - CLI Tool for Purpose/Scope/Outcome planning"
-    )
-    
-    parser.add_argument(
-        "--purpose", 
-        help="Description of the purpose of the task (why it matters)"
-    )
-    
-    parser.add_argument(
-        "--outcome", 
-        help="Description of the outcome of the task (what's delivered)"
-    )
-    
-    parser.add_argument(
-        "--output", 
-        default="scopemate_plan.json",
-        help="Output file to save the plan (default: scopemate_plan.json)"
+        description="🪜  scopemate v.0.1.0 - Break down complex projects with LLMs",
+        epilog="Purpose: why it matters\n"
+               "Outcome: what will change once it's done\n"
+               "Scope: how will be delivered (this is where LLM can help)",
+        formatter_class=argparse.RawTextHelpFormatter
     )
     
     parser.add_argument(
         "--interactive",
         action="store_true",
-        help="Run in interactive mode to build a task hierarchy"
+        help="Launch guided workflow to define task, generate LLM-powered breakdowns, and estimate scope"
     )
     
+    parser.add_argument(
+        "--outcome", 
+        help="🎯 Outcome: Clearly define what will be delivered and how success will be measured (asks: What will change once this is done?)"
+    )
+
+    parser.add_argument(
+        "--purpose", 
+        help="🧭 Purpose: Clearly define why this project matters strategically (asks: Why does this matter now?)"
+    )
+    
+    parser.add_argument(
+        "--output", 
+        default="scopemate_plan.json",
+        help="JSON file to save the task breakdown and scope estimates (default: scopemate_plan.json)"
+    )
     args = parser.parse_args()
     
     # Check if running in interactive mode
