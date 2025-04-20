@@ -4,7 +4,7 @@ This package provides tools for breaking down complex tasks using
 the Purpose/Scope/Outcome planning approach.
 """
 
-__version__ = "0.1.2"
+__version__ = "0.2.0"
 
 # Public API
 from .models import (
